@@ -44,7 +44,7 @@ jobs:
             -scheme Momentum \
             CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
             -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=latest' \
+            -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=latest' \
             ONLY_ACTIVE_ARCH=YES
 
       - name: Run Unit Tests
@@ -54,7 +54,7 @@ jobs:
             -scheme Momentum \
             CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
             -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=latest' \
+            -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=latest' \
             -only-testing:MomentumTests \
             ONLY_ACTIVE_ARCH=YES
 
@@ -70,7 +70,7 @@ jobs:
             echo "🚀 Setting up simulator for UI tests"
 
             # Get the device UUID
-            DEVICE_UUID=$(xcrun simctl list devices available | grep "iPhone 16 Pro" | grep -v "unavailable" | head -1 | grep -oE '\([A-F0-9-]+\)' | tr -d '()')
+            DEVICE_UUID=$(xcrun simctl list devices available | grep "iPhone 17 Pro" | grep -v "unavailable" | head -1 | grep -oE '\([A-F0-9-]+\)' | tr -d '()')
             echo "Device UUID: $DEVICE_UUID"
             
             # Shutdown any running simulators
@@ -102,7 +102,7 @@ jobs:
             sleep 2
             
             # Verify simulator status
-            xcrun simctl list devices | grep "iPhone 16 Pro"
+            xcrun simctl list devices | grep "iPhone 17 Pro"
 
             # Give the simulator extra time to settle
             sleep 5
@@ -116,7 +116,7 @@ jobs:
             -scheme Momentum \
             CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
             -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=latest' \
+            -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=latest' \
             -only-testing:MomentumUITests \
             ONLY_ACTIVE_ARCH=YES
 
@@ -131,7 +131,7 @@ jobs:
             -scheme Momentum \
             CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
             -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=latest' \
+            -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=latest' \
             -only-testing:MomentumUITests \
             ONLY_ACTIVE_ARCH=YES \
             -maximum-concurrent-test-device-destinations 1 \
@@ -149,7 +149,7 @@ jobs:
                 -scheme Momentum \
                 CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
                 -sdk iphonesimulator \
-                -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=latest' \
+                -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=latest' \
                 -only-testing:MomentumUITests \
                 ONLY_ACTIVE_ARCH=YES \
                 -maximum-concurrent-test-device-destinations 1 \
