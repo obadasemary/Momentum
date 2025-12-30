@@ -70,27 +70,32 @@ jobs:
             echo "🚀 Setting up simulator for UI tests"
 
             # Get the device UUID
-            DEVICE_UUID=$(xcrun simctl list devices available | grep "iPhone 17 Pro" | grep -v "unavailable" | head -1 | grep -oE '\([A-F0-9-]+\)' | tr -d '()')
+            DEVICE_UUID=$(xcrun simctl list devices available | grep "iPhone 17 Pro" | grep -v "unavailable" | grep -v "Clone" | head -1 | grep -oE '\([A-F0-9-]+\)' | tr -d '()')
             echo "Device UUID: $DEVICE_UUID"
-            
-            # Shutdown any running simulators
+            echo "DEVICE_UUID=$DEVICE_UUID" >> $GITHUB_ENV
+
+            # Shutdown any running simulators and delete clones
             xcrun simctl shutdown all 2>/dev/null || true
-            
+            xcrun simctl delete unavailable 2>/dev/null || true
+
+            # Delete any existing clones
+            xcrun simctl list devices | grep "Clone" | grep -oE '\([A-F0-9-]+\)' | tr -d '()' | xargs -I {} xcrun simctl delete {} 2>/dev/null || true
+
             # Erase the simulator to start fresh
             xcrun simctl erase "$DEVICE_UUID" || true
-            
+
             # Boot the simulator
             echo "⏳ Booting simulator..."
             xcrun simctl boot "$DEVICE_UUID" || echo "Simulator may already be booted"
 
             # Wait for simulator to be fully booted using bootstatus (blocks until ready)
             echo "⏳ Waiting for simulator to be ready..."
-            timeout 120 xcrun simctl bootstatus "$DEVICE_UUID" -b || echo "Simulator boot completed or timeout reached"
+            timeout 180 xcrun simctl bootstatus "$DEVICE_UUID" -b || echo "Simulator boot completed or timeout reached"
 
             # Additional wait to ensure services are ready
-            sleep 3
+            sleep 5
             echo "✅ Simulator is ready"
-            
+
             # Disable animations and accessibility features that can interfere with UI tests
             echo "⚙️ Configuring simulator for UI testing"
 
@@ -99,13 +104,13 @@ jobs:
             xcrun simctl ui "$DEVICE_UUID" reduce_motion enable || true
 
             # Allow time for settings to apply
-            sleep 2
-            
+            sleep 3
+
             # Verify simulator status
-            xcrun simctl list devices | grep "iPhone 17 Pro"
+            xcrun simctl list devices | grep "iPhone 17 Pro" | grep -v "Clone"
 
             # Give the simulator extra time to settle
-            sleep 5
+            sleep 10
 
       - name: Build UI Test Target
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -116,7 +121,7 @@ jobs:
             -scheme Momentum \
             CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
             -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=latest' \
+            -destination "platform=iOS Simulator,id=$DEVICE_UUID" \
             -only-testing:MomentumUITests \
             ONLY_ACTIVE_ARCH=YES
 
@@ -124,6 +129,7 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
             echo "🧪 Running UI Tests on main branch"
+            echo "Using simulator: $DEVICE_UUID"
 
             # Run tests without building (already built in previous step)
             xcodebuild test-without-building \
@@ -131,17 +137,18 @@ jobs:
             -scheme Momentum \
             CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
             -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=latest' \
+            -destination "platform=iOS Simulator,id=$DEVICE_UUID" \
             -only-testing:MomentumUITests \
             ONLY_ACTIVE_ARCH=YES \
+            -parallel-testing-enabled NO \
             -maximum-concurrent-test-device-destinations 1 \
             -test-timeouts-enabled YES \
-            -default-test-execution-time-allowance 120 \
-            -maximum-test-execution-time-allowance 180 \
+            -default-test-execution-time-allowance 180 \
+            -maximum-test-execution-time-allowance 300 \
             -resultBundlePath ./UITestResults.xcresult \
             || {
                 echo "❌ UI Tests failed on first attempt, retrying..."
-                sleep 10
+                sleep 15
 
                 # Retry once on failure
                 xcodebuild test-without-building \
@@ -149,13 +156,14 @@ jobs:
                 -scheme Momentum \
                 CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
                 -sdk iphonesimulator \
-                -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=latest' \
+                -destination "platform=iOS Simulator,id=$DEVICE_UUID" \
                 -only-testing:MomentumUITests \
                 ONLY_ACTIVE_ARCH=YES \
+                -parallel-testing-enabled NO \
                 -maximum-concurrent-test-device-destinations 1 \
                 -test-timeouts-enabled YES \
-                -default-test-execution-time-allowance 120 \
-                -maximum-test-execution-time-allowance 180 \
+                -default-test-execution-time-allowance 180 \
+                -maximum-test-execution-time-allowance 300 \
                 -resultBundlePath ./UITestResults-Retry.xcresult
             }
       
