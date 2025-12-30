@@ -11,9 +11,6 @@ on:
 
 jobs:
   claude-review:
-    # Skip this PR that adds the workflow (it won't work until merged to main)
-    if: github.event.pull_request.number != 4
-
     # Optional: Filter by PR author
     # if: |
     #   github.event.pull_request.user.login == 'external-contributor' ||
