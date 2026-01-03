@@ -9,30 +9,37 @@ import Foundation
 
 class MockFeedRepository: FeedRepositoryProtocol {
     
+    private let result: Result<FeedEntity, Error>
+    
+    init(result: Result<FeedEntity, Error>) {
+        self.result = result
+    }
+    
     func fetchFeed(url: URL) async throws -> FeedEntity {
-        FeedEntity(
-            info: .init(
-                count: 1,
-                pages: 1
-            ),
-            results: [
-                .init(
-                    id: 1,
-                    name: "Obada",
-                    image: URL(string: "https://rickandmortyapi.com/api/character/avatar/1.jpeg")
-                ),
-                .init(
-                    id: 2,
-                    name: "Sara",
-                    image: URL(string: "https://rickandmortyapi.com/api/character/avatar/2.jpeg")
-                )
-                ,
-                .init(
-                    id: 3,
-                    name: "Nazli",
-                    image: URL(string: "https://rickandmortyapi.com/api/character/avatar/3.jpeg")
-                )
-            ]
-        )
+//        FeedEntity(
+//            info: .init(
+//                count: 1,
+//                pages: 1
+//            ),
+//            results: [
+//                .init(
+//                    id: 1,
+//                    name: "Obada",
+//                    image: URL(string: "https://rickandmortyapi.com/api/character/avatar/1.jpeg")
+//                ),
+//                .init(
+//                    id: 2,
+//                    name: "Sara",
+//                    image: URL(string: "https://rickandmortyapi.com/api/character/avatar/2.jpeg")
+//                )
+//                ,
+//                .init(
+//                    id: 3,
+//                    name: "Nazli",
+//                    image: URL(string: "https://rickandmortyapi.com/api/character/avatar/3.jpeg")
+//                )
+//            ]
+//        )
+        try result.get()
     }
 }
