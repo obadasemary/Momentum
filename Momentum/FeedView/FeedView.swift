@@ -31,6 +31,10 @@ struct FeedView: View {
                     )
                 } else {
                     CarouselView(characters: viewModel.characters)
+                    
+                    ForEach(viewModel.characters, id: \.id) { character in
+                        CharacterView(character: character)
+                    }
                 }
             }
             .task {
