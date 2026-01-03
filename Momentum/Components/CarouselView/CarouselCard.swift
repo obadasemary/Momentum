@@ -8,11 +8,51 @@
 import SwiftUI
 
 struct CarouselCard: View {
+    
+    let character: CharactersResponse
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        ZStack(alignment: .bottomLeading) {
+            ImageLoaderView(url: character.image)
+                .frame(height: 220)
+                .clipped()
+            
+            LinearGradient(
+                colors: [.black.opacity(0.7), .clear],
+                startPoint: .bottom,
+                endPoint: .top
+            )
+            .frame(height: 90)
+            .frame(maxWidth: .infinity, alignment: .bottom)
+            
+            VStack(alignment: .leading) {
+                Text(character.name)
+                    .font(.title)
+                    .bold()
+                    .foregroundColor(.white)
+                
+                if let species = character.species, !species.isEmpty {
+                    Text(species)
+                        .font(.footnote)
+                        .foregroundColor(.white.opacity(0.85))
+                }
+            }
+            .padding(16)
+        }
+        .contentShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 }
 
 #Preview {
-    CarouselCard()
+    CarouselCard(
+        character: .init(
+            id: 1,
+            name: "Obada",
+            species: "Human",
+            image: URL(
+                string: "https://rickandmortyapi.com/api/character/avatar/1.jpeg"
+            )
+        )
+    )
 }
