@@ -21,14 +21,13 @@ struct CarouselView: View {
                 TabView(selection: $currentIndex) {
                     ForEach(characters, id: \.id) { character in
                         CarouselCard(character: character)
-                            .buttonStyle(.plain)
                             .padding(.horizontal)
                     }
                 }
                 .tabViewStyle(.page(indexDisplayMode: .automatic))
                 .frame(height: 220)
                 .clipShape(
-                    RoundedRectangle(cornerRadius: 15, style: .continuous)
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
                 )
                 .padding(.top)
             }
