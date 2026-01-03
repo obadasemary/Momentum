@@ -12,8 +12,10 @@ struct CharacterListView: View {
     let characters: [CharactersResponse]
     
     var body: some View {
-        ForEach(characters, id: \.id) { character in
-            CharacterView(character: character)
+        LazyVStack {        
+            ForEach(characters, id: \.id) { character in
+                CharacterView(character: character)
+            }
         }
     }
 }
