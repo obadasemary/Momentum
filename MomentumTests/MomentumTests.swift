@@ -65,6 +65,33 @@ struct MomentumTests {
         
         #expect(viewModel.characters.isEmpty)
     }
+    
+    @MainActor
+    @Test("Loading state becomes false after fetch")
+    func loadingStateToggle() async {
+     
+        let sut = FeedViewModel(
+            feedUseCase: MockFeedUseCase(
+                result: .success(
+                    .init(
+                        info: .init(
+                            count: 0,
+                            pages: 0
+                        ),
+                        results: []
+                    )
+                )
+            )
+        )
+        
+        #expect(sut.isLoading == false)
+        
+        let loadTask = Task { await sut.loadData() }
+        
+        await loadTask.value
+        
+        #expect(sut.isLoading == false)
+    }
 }
 
 private extension MomentumTests {
