@@ -17,7 +17,7 @@ Momentum is a multi-platform SwiftUI application targeting iOS 26.0+, iPadOS, ma
 xcodebuild -project Momentum.xcodeproj -scheme Momentum -configuration Debug build
 
 # Build for specific destination (iOS Simulator)
-xcodebuild -project Momentum.xcodeproj -scheme Momentum -destination 'platform=iOS Simulator,name=iPhone 16' build
+xcodebuild -project Momentum.xcodeproj -scheme Momentum -destination 'platform=iOS Simulator,name=iPhone 17' build
 
 # Build for macOS
 xcodebuild -project Momentum.xcodeproj -scheme Momentum -destination 'platform=macOS' build
@@ -115,8 +115,8 @@ Dependencies point inward - outer layers depend on inner layers, never the rever
 
 ```text
 ┌─────────────────────────────────────────────┐
-│   Presentation Layer (Views & ViewModels)  │
-│       SwiftUI Views, ViewModels, etc.      │
+│   Presentation Layer (Views & ViewModels)   │
+│       SwiftUI Views, ViewModels, etc.       │
 └──────────────────┬──────────────────────────┘
                    │ depends on
                    ↓
