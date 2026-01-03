@@ -9,9 +9,12 @@ import SwiftUI
 
 @main
 struct MomentumApp: App {
+    
+    @State private var feedBuilder = FeedBuilder()
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            feedBuilder.buildFeedView()
         }
     }
 }
