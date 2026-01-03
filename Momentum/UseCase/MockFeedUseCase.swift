@@ -16,11 +16,6 @@ final class MockFeedUseCase: FeedUseCaseProtocol {
     }
     
     func fetchFeed(url: URL) async throws -> FeedEntity {
-        switch result {
-        case .success(let success):
-            success
-        case .failure(let failure):
-            throw failure
-        }
+        try result.get()
     }
 }
