@@ -37,11 +37,10 @@ final class FeedViewModel {
     }
 }
 
-extension FeedViewModel {
+private extension FeedViewModel {
     
     func fetchFeed() async throws {
         guard let url = Constants.url else {
-            isLoading = false
             return
         }
         
