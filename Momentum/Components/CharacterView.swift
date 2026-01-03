@@ -33,7 +33,6 @@ struct CharacterView: View {
         .padding()
         .background(.regularMaterial.opacity(0.5))
         .clipShape(RoundedRectangle(cornerRadius: 8))
-//        .cornerRadius(16)
         .padding(.horizontal)
     }
 }
