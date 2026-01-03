@@ -24,7 +24,7 @@ struct InfoResponse: Decodable {
     }
 }
 
-struct CharactersResponse: Decodable {
+struct CharactersResponse: Decodable, Identifiable, Equatable {
 
     let id: Int
     let name: String
