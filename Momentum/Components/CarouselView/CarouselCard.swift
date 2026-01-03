@@ -29,7 +29,7 @@ struct CarouselCard: View {
                 Text(character.name)
                     .font(.title)
                     .bold()
-                    .foregroundColor(.white)
+                    .foregroundStyle(.white)
                 
                 if let species = character.species, !species.isEmpty {
                     Text(species)
