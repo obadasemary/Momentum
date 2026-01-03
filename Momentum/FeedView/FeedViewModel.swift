@@ -6,3 +6,15 @@
 //
 
 import Foundation
+
+@Observable
+final class FeedViewModel {
+    
+    private let feedUseCase: FeedUseCaseProtocol
+    
+    private(set) var characters: [CharactersResponse] = []
+    
+    init(feedUseCase: FeedUseCaseProtocol) {
+        self.feedUseCase = feedUseCase
+    }
+}
