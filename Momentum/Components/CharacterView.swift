@@ -16,7 +16,7 @@ struct CharacterView: View {
         HStack(alignment: .top) {
             ImageLoaderView(url: character.image)
                 .frame(width: imageSize, height: imageSize)
-                .cornerRadius(8)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
             
             VStack(alignment: .leading) {
                 Text(character.name)
@@ -31,10 +31,9 @@ struct CharacterView: View {
             Spacer()
         }
         .padding()
-        .background {
-            Color(UIColor.secondarySystemBackground).opacity(0.5)
-        }
-        .cornerRadius(16)
+        .background(.regularMaterial.opacity(0.5))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+//        .cornerRadius(16)
         .padding(.horizontal)
     }
 }
