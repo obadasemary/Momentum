@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Momentum is a multi-platform SwiftUI application targeting iOS 26.0+, iPadOS, macOS, and visionOS. The project uses Swift 6.2+ with strict concurrency rules, MainActor isolation, and approachable concurrency enabled.
+Momentum is a multi-platform SwiftUI application targeting iOS 26.0+, iPadOS, macOS, and visionOS. The project uses Swift 6.2 with strict concurrency rules and approachable concurrency enabled.
 
 **Development role:** Senior iOS Engineer specializing in SwiftUI, SwiftData, and related Apple frameworks. Code must adhere to Apple's Human Interface Guidelines and App Review guidelines.
 
@@ -59,7 +59,6 @@ swiftlint
 
 - **SwiftUI only** - Avoid UIKit unless specifically requested
 - Use `@Observable` classes (not `ObservableObject`) for shared data
-- Always mark `@Observable` classes with `@MainActor`
 - Do not introduce third-party frameworks without asking first
 
 ### Swift Best Practices
@@ -163,12 +162,6 @@ User Action → View → ViewModel → UseCase → Repository → Network/DB
                       State     Logic      Access      Request
 ```
 
-#### 5. Actor Isolation (@MainActor)
-
-- Most UI-related classes are `@MainActor` to ensure UI updates on main thread
-- Critical for preventing data races in Swift 6's strict concurrency model
-- **Do not remove `@MainActor` without careful consideration**
-
 ### Design Patterns
 
 #### Builder Pattern
@@ -184,7 +177,6 @@ Every feature should have a Builder class that composes views with dependencies.
 **Example:**
 
 ```swift
-@MainActor
 @Observable
 final class FeatureBuilder {
     private let container: DIContainer
@@ -214,7 +206,6 @@ ViewModels should use enum-based state machines for clarity.
 **Example:**
 
 ```swift
-@MainActor
 @Observable
 final class FeatureViewModel {
     enum State {
@@ -369,7 +360,6 @@ Use Swift 5.9+ `@Observable` macro (never `ObservableObject`).
 **ViewModels:**
 
 ```swift
-@MainActor
 @Observable
 final class FeatureViewModel {
     var state: State = .idle
@@ -434,9 +424,7 @@ The app is configured to run on:
 ### Concurrency
 
 - Swift 6 concurrency enabled with strict checking
-- Default actor isolation: `MainActor`
 - Use `async/await` for asynchronous operations
-- SwiftUI views automatically inherit `@MainActor` isolation
 - Never use Grand Central Dispatch
 
 ### Common Patterns
@@ -490,8 +478,7 @@ func refresh() {
 
 ### Important Constraints
 
-1. **@MainActor is Critical** - Most UI classes are `@MainActor` for thread safety; removing can cause data races
-2. **No Force Unwrapping** - Use safe unwrapping: `if let`, `guard let`, or handle optionals properly
-3. **Protocol-First Development** - Always define protocols for cross-module dependencies
-4. **Builder Pattern is Mandatory** - Features must be composed via builder classes
-5. **One Type Per File** - Each struct/class/enum should have its own file
+1. **No Force Unwrapping** - Use safe unwrapping: `if let`, `guard let`, or handle optionals properly
+2. **Protocol-First Development** - Always define protocols for cross-module dependencies
+3. **Builder Pattern is Mandatory** - Features must be composed via builder classes
+4. **One Type Per File** - Each struct/class/enum should have its own file
