@@ -32,8 +32,8 @@ extension NetworkService: NetworkServiceProtocol {
         }
         
         do {
-            let decoadedResponse = try JSONDecoder().decode(T.self, from: data)
-            return decoadedResponse
+            let decodedResponse = try JSONDecoder().decode(T.self, from: data)
+            return decodedResponse
         } catch {
             throw NetworkServiceError.decodingError
         }
