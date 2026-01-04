@@ -9,24 +9,28 @@ import Foundation
 
 @Observable
 final class FeedViewModel {
-    
+
     private let feedUseCase: FeedUseCaseProtocol
-    
+    private let debugDelay: Duration
+
     private(set) var characters: [CharactersResponse] = []
     private(set) var isLoading: Bool = false
     private(set) var errorMessage: String?
-    
-    init(feedUseCase: FeedUseCaseProtocol) {
+
+    init(feedUseCase: FeedUseCaseProtocol, debugDelay: Duration = .zero) {
         self.feedUseCase = feedUseCase
+        self.debugDelay = debugDelay
     }
     
     func loadData() async {
         
         isLoading = true
-        
+
         do {
             #if DEBUG
-            try? await Task.sleep(for: .seconds(3))
+            if debugDelay > .zero {
+                try? await Task.sleep(for: debugDelay)
+            }
             #endif
             try await fetchFeed()
         } catch {
