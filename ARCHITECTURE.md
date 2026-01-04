@@ -17,10 +17,10 @@
 
 ## Overview
 
-**RickMorty** is a native iOS application built with **Swift 6.0** and **SwiftUI**, following **Clean Architecture** principles. The app displays characters from the Rick and Morty API with features including infinite scroll pagination, status filtering, and detailed character views.
+**Momentum** is a native iOS application built with **Swift 6.2** and **SwiftUI**, following **Clean Architecture** principles. The app displays characters from the Rick and Morty API with features including infinite scroll pagination, status filtering, and detailed character views.
 
 ### Technology Stack
-- **Language**: Swift 6.0 (strict concurrency enabled)
+- **Language**: Swift 6.2 (strict concurrency enabled)
 - **UI Framework**: SwiftUI with `@Observable` macro
 - **Minimum Deployment**: iOS 17.0+
 - **Build System**: Xcode 16.4+
