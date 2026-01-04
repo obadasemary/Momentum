@@ -23,8 +23,9 @@ final class FeedViewModel {
     }
     
     func loadData() async {
-        
+
         isLoading = true
+        errorMessage = nil
 
         do {
             #if DEBUG
@@ -34,9 +35,9 @@ final class FeedViewModel {
             #endif
             try await fetchFeed()
         } catch {
-            errorMessage  = error.localizedDescription
+            errorMessage = error.localizedDescription
         }
-        
+
         isLoading = false
     }
 }
