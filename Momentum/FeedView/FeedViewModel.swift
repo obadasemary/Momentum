@@ -21,6 +21,17 @@ final class FeedViewModel {
         self.feedUseCase = feedUseCase
         self.debugDelay = debugDelay
     }
+
+    enum FeedError: LocalizedError {
+        case invalidURL
+
+        var errorDescription: String? {
+            switch self {
+            case .invalidURL:
+                return "Invalid feed URL configuration"
+            }
+        }
+    }
     
     func loadData() async {
 
@@ -43,12 +54,12 @@ final class FeedViewModel {
 }
 
 private extension FeedViewModel {
-    
+
     func fetchFeed() async throws {
         guard let url = Constants.url else {
-            return
+            throw FeedError.invalidURL
         }
-        
+
         let response = try await feedUseCase.fetchFeed(url: url)
         characters = response.results
     }

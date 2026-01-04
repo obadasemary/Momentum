@@ -102,8 +102,15 @@ struct PlaceholderCharacterView: View {
         .buildFeedView(isUsingMock: true, debugDelay: .seconds(3))
 }
 
-#Preview("Error State") {
+#Preview("Error State - Network") {
     let mockUseCase = MockFeedUseCase(result: .failure(NSError(domain: "TestError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Network connection failed"])))
+    let viewModel = FeedViewModel(feedUseCase: mockUseCase)
+
+    FeedView(viewModel: viewModel)
+}
+
+#Preview("Error State - Invalid URL") {
+    let mockUseCase = MockFeedUseCase(result: .failure(FeedViewModel.FeedError.invalidURL))
     let viewModel = FeedViewModel(feedUseCase: mockUseCase)
 
     FeedView(viewModel: viewModel)
