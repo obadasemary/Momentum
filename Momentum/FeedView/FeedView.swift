@@ -29,21 +29,8 @@ struct FeedView: View {
                         description: Text("Pull to refresh")
                     )
                 } else {
-                    if viewModel.isLoading {
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color.gray.opacity(0.5))
-                            .frame(height: 220)
-                            .padding(.horizontal)
-                            .redacted(reason: .placeholder)
-                            .padding(.bottom)
-
-                        ForEach(0..<4, id: \.self) { _ in
-                            placeholderCharacterView
-                        }
-                    } else {
-                        CarouselView(characters: viewModel.characters)
-                        CharacterListView(characters: viewModel.characters)
-                    }
+                    CarouselView(characters: viewModel.characters)
+                    CharacterListView(characters: viewModel.characters)
                 }
             }
             .task {
