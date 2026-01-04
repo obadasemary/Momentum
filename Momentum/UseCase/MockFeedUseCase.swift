@@ -8,13 +8,13 @@
 import Foundation
 
 final class MockFeedUseCase: FeedUseCaseProtocol {
-    
-    private let result: Result<FeedEntity, Error>
-    
+
+    var result: Result<FeedEntity, Error>
+
     init(result: Result<FeedEntity, Error>) {
         self.result = result
     }
-    
+
     func fetchFeed(url: URL) async throws -> FeedEntity {
         try result.get()
     }
