@@ -22,10 +22,10 @@ struct FeedView: View {
                     )
                 } else if viewModel.isLoading && viewModel.characters.isEmpty {
 
-                    placeholderCarouselView
+                    PlaceholderCarouselView()
 
                     ForEach(0..<4, id: \.self) { _ in
-                        placeholderCharacterView
+                        PlaceholderCharacterView()
                     }
 
                 } else if viewModel.characters.isEmpty {
@@ -50,9 +50,8 @@ struct FeedView: View {
     }
 }
 
-private extension FeedView {
-    
-    var placeholderCarouselView: some View {
+struct PlaceholderCarouselView: View {
+    var body: some View {
         RoundedRectangle(cornerRadius: 12)
             .fill(Color.gray.opacity(0.5))
             .frame(height: 220)
@@ -60,8 +59,10 @@ private extension FeedView {
             .redacted(reason: .placeholder)
             .padding(.bottom)
     }
-    
-    var placeholderCharacterView: some View {
+}
+
+struct PlaceholderCharacterView: View {
+    var body: some View {
         HStack(alignment: .top) {
             RoundedRectangle(cornerRadius: 16)
                 .fill(Color.gray.opacity(0.5))
