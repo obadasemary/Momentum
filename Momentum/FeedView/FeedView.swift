@@ -81,9 +81,16 @@ private extension FeedView {
     }
 }
 
-#Preview {
+#Preview("Default") {
     let feedBuilder = FeedBuilder()
-    
+
     feedBuilder
         .buildFeedView(isUsingMock: true)
+}
+
+#Preview("With Loading Delay") {
+    let feedBuilder = FeedBuilder()
+
+    feedBuilder
+        .buildFeedView(isUsingMock: true, debugDelay: .seconds(3))
 }
