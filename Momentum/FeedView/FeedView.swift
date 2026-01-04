@@ -14,14 +14,20 @@ struct FeedView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                if viewModel.isLoading && viewModel.characters.isEmpty {
-                    
+                if let errorMessage = viewModel.errorMessage {
+                    ContentUnavailableView(
+                        "Error Loading Feed",
+                        systemImage: "exclamationmark.triangle.fill",
+                        description: Text(errorMessage)
+                    )
+                } else if viewModel.isLoading && viewModel.characters.isEmpty {
+
                     placeholderCarouselView
-                    
+
                     ForEach(0..<4, id: \.self) { _ in
                         placeholderCharacterView
                     }
-                    
+
                 } else if viewModel.characters.isEmpty {
                     ContentUnavailableView(
                         "No Feed",
@@ -93,4 +99,11 @@ private extension FeedView {
 
     feedBuilder
         .buildFeedView(isUsingMock: true, debugDelay: .seconds(3))
+}
+
+#Preview("Error State") {
+    let mockUseCase = MockFeedUseCase(result: .failure(NSError(domain: "TestError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Network connection failed"])))
+    let viewModel = FeedViewModel(feedUseCase: mockUseCase)
+
+    FeedView(viewModel: viewModel)
 }
