@@ -23,9 +23,11 @@ struct CharacterView: View {
                     .font(.title)
                     .foregroundStyle(.primary)
 
-                Text(character.species ?? "")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                if let species = character.species, !species.isEmpty {
+                    Text(species)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
             }
 
             Spacer()
