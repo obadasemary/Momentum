@@ -34,7 +34,7 @@ struct CarouselCard: View {
                 if let species = character.species, !species.isEmpty {
                     Text(species)
                         .font(.footnote)
-                        .foregroundColor(.white.opacity(0.85))
+                        .foregroundStyle(.white.opacity(0.85))
                 }
             }
             .padding(16)
