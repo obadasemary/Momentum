@@ -22,8 +22,8 @@ struct MomentumTests {
                 image: nil
             ),
             CharactersResponse(
-                id: 1,
-                name: "Obada",
+                id: 2,
+                name: "Sara",
                 species: "Human",
                 image: nil
             )
