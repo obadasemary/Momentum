@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+/// Displays an image from a URL with loading and error states.
+/// Image caching is handled by URLCache configured in MomentumApp.
 struct ImageLoaderView: View {
     
     let url: URL?
