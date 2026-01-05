@@ -11,14 +11,12 @@ struct CarouselView: View {
     
     let characters: [CharactersResponse]
     
-    @State private var currentIndex: Int = 0
-    
     var body: some View {
         Group {
             if characters.isEmpty {
                 EmptyView()
             } else {
-                TabView(selection: $currentIndex) {
+                TabView {
                     ForEach(characters, id: \.id) { character in
                         CarouselCard(character: character)
                             .padding(.horizontal)
