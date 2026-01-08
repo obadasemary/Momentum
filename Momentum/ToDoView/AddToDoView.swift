@@ -1,7 +1,8 @@
 import SwiftUI
 
 struct AddToDoView: View {
-    let viewModel: ToDoViewModel
+    
+    @State var viewModel: ToDoViewModel
     @Environment(\.dismiss) private var dismiss
 
     @State private var title = ""

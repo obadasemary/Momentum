@@ -1,7 +1,8 @@
 import SwiftUI
 
 struct ToDoListView: View {
-    let viewModel: ToDoViewModel
+    
+    @State var viewModel: ToDoViewModel
     @State private var showingAddTodo = false
 
     var body: some View {

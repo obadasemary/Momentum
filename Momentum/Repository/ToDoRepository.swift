@@ -34,8 +34,9 @@ extension ToDoRepository: ToDoRepositoryProtocol {
     }
 
     func update(_ todo: ToDoEntity) async throws {
+        let todoID = todo.id
         let descriptor = FetchDescriptor<ToDoModel>(
-            predicate: #Predicate { $0.id == todo.id }
+            predicate: #Predicate { $0.id == todoID }
         )
         guard let model = try modelContext.fetch(descriptor).first else {
             throw ToDoRepositoryError.notFound

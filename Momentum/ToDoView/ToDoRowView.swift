@@ -2,7 +2,7 @@ import SwiftUI
 
 struct ToDoRowView: View {
     let todo: ToDoEntity
-    let viewModel: ToDoViewModel
+    @State var viewModel: ToDoViewModel
 
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
