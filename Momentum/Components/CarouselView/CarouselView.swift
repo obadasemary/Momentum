@@ -22,7 +22,9 @@ struct CarouselView: View {
                             .padding(.horizontal)
                     }
                 }
+                #if os(iOS)
                 .tabViewStyle(.page(indexDisplayMode: .automatic))
+                #endif
                 .frame(height: 220)
                 .clipShape(
                     RoundedRectangle(cornerRadius: 16, style: .continuous)
