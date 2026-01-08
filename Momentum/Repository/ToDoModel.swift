@@ -26,6 +26,7 @@ final class ToDoModel {
         self.completedAt = completedAt
     }
 
+    @MainActor
     func toEntity() -> ToDoEntity {
         ToDoEntity(
             id: id,
