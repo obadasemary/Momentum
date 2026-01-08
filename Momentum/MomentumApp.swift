@@ -6,15 +6,18 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct MomentumApp: App {
-    
+
     @State private var feedBuilder = FeedBuilder()
-    
+    @State private var todoBuilder = ToDoBuilder()
+
     var body: some Scene {
         WindowGroup {
-            feedBuilder.buildFeedView()
+            ContentView(feedBuilder: feedBuilder, todoBuilder: todoBuilder)
         }
+        .modelContainer(for: ToDoModel.self)
     }
 }
