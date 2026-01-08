@@ -6,17 +6,21 @@ final class ToDoViewModel {
         case idle
         case loading
         case loaded([ToDoEntity])
-        case error(Error)
+        case error(Error, preservedData: [ToDoEntity]?)
     }
 
     private(set) var state: State = .idle
     private let useCase: ToDoUseCaseProtocol
 
     var todos: [ToDoEntity] {
-        if case .loaded(let todos) = state {
+        switch state {
+        case .loaded(let todos):
             return todos
+        case .error(_, let preservedData):
+            return preservedData ?? []
+        default:
+            return []
         }
-        return []
     }
 
     var isLoading: Bool {
@@ -27,7 +31,7 @@ final class ToDoViewModel {
     }
 
     var errorMessage: String? {
-        if case .error(let error) = state {
+        if case .error(let error, _) = state {
             return error.localizedDescription
         }
         return nil
@@ -52,60 +56,64 @@ final class ToDoViewModel {
             let todos = try await useCase.fetchAll()
             state = .loaded(todos)
         } catch {
-            state = .error(error)
+            state = .error(error, preservedData: nil)
         }
     }
 
     func createTodo(title: String, notes: String?) async {
+        guard case .loaded(let currentTodos) = state else { return }
+
         do {
             let newTodo = try await useCase.create(title: title, notes: notes)
-            if case .loaded(var todos) = state {
-                todos.insert(newTodo, at: 0)
-                state = .loaded(todos)
-            }
+            var todos = currentTodos
+            todos.insert(newTodo, at: 0)
+            state = .loaded(todos)
         } catch {
-            state = .error(error)
+            state = .error(error, preservedData: currentTodos)
         }
     }
 
     func updateTodo(_ todo: ToDoEntity) async {
+        guard case .loaded(let currentTodos) = state else { return }
+
         do {
             try await useCase.update(todo)
-            if case .loaded(var todos) = state {
-                if let index = todos.firstIndex(where: { $0.id == todo.id }) {
-                    todos[index] = todo
-                    state = .loaded(todos)
-                }
+            var todos = currentTodos
+            if let index = todos.firstIndex(where: { $0.id == todo.id }) {
+                todos[index] = todo
+                state = .loaded(todos)
             }
         } catch {
-            state = .error(error)
+            state = .error(error, preservedData: currentTodos)
         }
     }
 
     func deleteTodo(_ id: UUID) async {
+        guard case .loaded(let currentTodos) = state else { return }
+
         do {
             try await useCase.delete(id)
-            if case .loaded(var todos) = state {
-                todos.removeAll { $0.id == id }
-                state = .loaded(todos)
-            }
+            var todos = currentTodos
+            todos.removeAll { $0.id == id }
+            state = .loaded(todos)
         } catch {
-            state = .error(error)
+            state = .error(error, preservedData: currentTodos)
         }
     }
 
     func toggleCompletion(_ id: UUID) async {
+        guard case .loaded(let currentTodos) = state else { return }
+
         do {
             try await useCase.toggleCompletion(id)
-            if case .loaded(var todos) = state {
-                if let index = todos.firstIndex(where: { $0.id == id }) {
-                    todos[index].isCompleted.toggle()
-                    todos[index].completedAt = todos[index].isCompleted ? Date() : nil
-                    state = .loaded(todos)
-                }
+            var todos = currentTodos
+            if let index = todos.firstIndex(where: { $0.id == id }) {
+                todos[index].isCompleted.toggle()
+                todos[index].completedAt = todos[index].isCompleted ? Date() : nil
+                state = .loaded(todos)
             }
         } catch {
-            state = .error(error)
+            state = .error(error, preservedData: currentTodos)
         }
     }
 }
