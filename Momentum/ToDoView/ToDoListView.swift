@@ -1,9 +1,10 @@
 import SwiftUI
 
 struct ToDoListView: View {
-    
+
     @State var viewModel: ToDoViewModel
     @State private var showingAddTodo = false
+    @State private var showingError = false
 
     var body: some View {
         NavigationStack {
@@ -15,8 +16,12 @@ struct ToDoListView: View {
                     ProgressView()
                 case .loaded:
                     todoListContent
-                case .error(let error):
-                    errorView(error)
+                case .error(_, let preservedData):
+                    if preservedData != nil {
+                        todoListContent
+                    } else {
+                        errorView
+                    }
                 }
             }
             .navigationTitle("To-Do")
@@ -29,6 +34,20 @@ struct ToDoListView: View {
             }
             .sheet(isPresented: $showingAddTodo) {
                 AddToDoView(viewModel: viewModel)
+            }
+            .alert("Error", isPresented: $showingError) {
+                Button("OK") {
+                    showingError = false
+                }
+            } message: {
+                if let errorMessage = viewModel.errorMessage {
+                    Text(errorMessage)
+                }
+            }
+            .onChange(of: viewModel.errorMessage) {
+                if viewModel.errorMessage != nil {
+                    showingError = true
+                }
             }
             .task {
                 if case .idle = viewModel.state {
@@ -74,11 +93,11 @@ struct ToDoListView: View {
         )
     }
 
-    private func errorView(_ error: Error) -> some View {
+    private var errorView: some View {
         ContentUnavailableView(
             "Error",
             systemImage: "exclamationmark.triangle",
-            description: Text(error.localizedDescription)
+            description: Text(viewModel.errorMessage ?? "An error occurred")
         )
     }
 }
