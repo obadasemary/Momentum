@@ -21,7 +21,9 @@ struct AddToDoView: View {
                 }
             }
             .navigationTitle("New To-Do")
+            #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
+            #endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
