@@ -1,5 +1,7 @@
 # Momentum
 
+[![iOS Build & Test](https://github.com/obadasemary/Momentum/actions/workflows/CI.yml/badge.svg)](https://github.com/obadasemary/Momentum/actions/workflows/CI.yml)
+
 A multi-platform SwiftUI application built with modern Swift concurrency and Clean Architecture principles.
 
 ## Platform Support
