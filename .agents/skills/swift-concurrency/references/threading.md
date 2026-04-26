@@ -1,6 +1,26 @@
 # Threading
 
-Understanding how Swift Concurrency manages threads and execution contexts.
+Use this when:
+
+- You need to understand the relationship between tasks and threads.
+- You are debugging suspension points, actor reentrancy, or unexpected execution contexts.
+- You need Swift 6.2 behavior guidance (`nonisolated async`, `@concurrent`, `nonisolated(nonsending)`).
+
+Skip this file if:
+
+- You mainly need to protect mutable state. Use `actors.md`.
+- You need to make types safe to transfer. Use `sendable.md`.
+
+Jump to:
+
+- Core Concepts (Tasks vs Threads)
+- Cooperative Thread Pool
+- Suspension Points and Actor Reentrancy
+- Swift 6.2 Changes (SE-461, SE-466)
+- Default Isolation Domain
+- Debugging Thread Execution
+- Common Misconceptions
+- Migration Strategy
 
 ## Core Concepts
 
@@ -120,6 +140,8 @@ let data = await fetchData() // Potential suspension
 1. **Code may pause unexpectedly** - resumes later, possibly different thread
 2. **State can change** - mutable state may be modified during suspension
 3. **Actor reentrancy** - other tasks can access actor during suspension
+
+`Task.sleep` follows the same rule: it suspends the task rather than blocking a thread. That still does not make actor choice irrelevant. If a delayed retry starts on `@MainActor`, it may wait for main-actor availability before reaching `Task.sleep` when scheduled from another executor or while the main actor is busy. Prefer `@concurrent` when the delay itself is not UI-owned, then hop back with `MainActor.run` for the final UI mutation.
 
 ### Actor reentrancy example
 
@@ -429,6 +451,29 @@ Seeing Sendable warnings?
 ├─ Same isolation OK? → nonisolated(nonsending)
 └─ Need different isolation? → Make Sendable or refactor
 ```
+
+## GCD to Isolation Domain Migration
+
+Instead of asking "what thread should this run on?" ask "what isolation domain should own this work?"
+
+- `DispatchQueue.main.async { }` → `@MainActor func updateUI()`
+- `DispatchQueue.global().async { }` → `func work() async` (or `@concurrent` if it must leave caller isolation)
+- `DispatchQueue(label:).sync { }` → `actor` or `Mutex` for protecting state
+- Serial queue for ordering → `actor` (guarantees serial access)
+
+## Decision Rules
+
+- UI state → usually `@MainActor`
+- Mutable shared state → usually an `actor`
+- Plain async work with no isolated state → `async` API with explicit ownership
+- Work that must hop away from caller isolation under Swift 6.2-era behavior → consider `@concurrent`
+
+## Common Mistakes Agents Make
+
+- Recommending GCD queue hopping when actor isolation already expresses the ownership model.
+- Debugging correctness by thread ID instead of by isolation and ordering.
+- Treating `await` as a blocking call — it suspends the task, freeing the thread.
+- Mapping each `Task` to a conceptual thread.
 
 ## Performance Insights
 
