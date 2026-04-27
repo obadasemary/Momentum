@@ -1,36 +1,62 @@
-name: iOS Build & Test
+name: CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [main, "feature/**"]
   pull_request:
-    branches: [ "main" ]
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  test:
+  spm-tests:
+    name: SPM Tests (${{ matrix.package }})
     runs-on: macos-26
-    timeout-minutes: 30
-
-    env:
-      XCODE_PROJECT: Momentum.xcodeproj
-      XCODE_SCHEME: Momentum
-      DESTINATION: 'platform=iOS Simulator,name=iPhone 17 Pro,OS=latest'
-
+    strategy:
+      matrix:
+        package: [Core, Domain, Data, Presentation]
+      fail-fast: false
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - name: Test ${{ matrix.package }}
+        run: swift test --package-path Packages/${{ matrix.package }}
 
-      - name: Run Tests
+  xcode-build-test:
+    name: Xcode Build & Test
+    runs-on: macos-26
+    needs: spm-tests
+    timeout-minutes: 30
+    env:
+      DESTINATION: 'platform=iOS Simulator,name=iPhone 17 Pro,OS=latest'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Generate Xcode project
+        run: xcodegen
+      - name: Build
+        run: |
+          xcodebuild \
+            -project MomentumApp/MomentumApp.xcodeproj \
+            -scheme Momentum \
+            -destination "$DESTINATION" \
+            -configuration Debug \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            ONLY_ACTIVE_ARCH=YES \
+            build
+      - name: Unit Tests
         run: |
           xcodebuild test \
-            -project $XCODE_PROJECT \
-            -scheme $XCODE_SCHEME \
+            -project MomentumApp/MomentumApp.xcodeproj \
+            -scheme Momentum \
             -destination "$DESTINATION" \
             -only-testing:MomentumTests \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             ONLY_ACTIVE_ARCH=YES
-
       - name: Upload Logs
         if: failure()
         uses: actions/upload-artifact@v4
