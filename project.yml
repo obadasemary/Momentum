@@ -1,0 +1,80 @@
+name: MomentumApp
+options:
+  deploymentTarget:
+    iOS: "26.2"
+  xcodeVersion: "16.3"
+  defaultConfig: Debug
+  groupSortPosition: top
+  generateEmptyDirectories: true
+
+settings:
+  base:
+    SWIFT_VERSION: "6.2"
+    SWIFT_STRICT_CONCURRENCY: complete
+    SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+    TARGETED_DEVICE_FAMILY: "1,2,7"
+    ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES: YES
+
+targets:
+  Momentum:
+    type: application
+    platform: iOS
+    deploymentTarget: "26.2"
+    sources:
+      - path: MomentumApp/Sources
+        excludes:
+          - "**/*.xcassets"
+    resources:
+      - MomentumApp/Sources/Resources
+    dependencies:
+      - package: Core
+        product: Core
+      - package: Domain
+        product: Domain
+      - package: Data
+        product: Data
+      - package: Presentation
+        product: Presentation
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.SamuraiStudios.Momentum
+        INFOPLIST_FILE: MomentumApp/Sources/Resources/Info.plist
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: ""
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+
+  MomentumTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: "26.2"
+    sources:
+      - MomentumApp/Tests/UnitTests
+    dependencies:
+      - target: Momentum
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.SamuraiStudios.MomentumTests
+
+  MomentumUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    deploymentTarget: "26.2"
+    sources:
+      - MomentumApp/Tests/AppUITests
+    dependencies:
+      - target: Momentum
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.SamuraiStudios.MomentumUITests
+
+packages:
+  Core:
+    path: Packages/Core
+  Domain:
+    path: Packages/Domain
+  Data:
+    path: Packages/Data
+  Presentation:
+    path: Packages/Presentation
