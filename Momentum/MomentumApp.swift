@@ -1,22 +1,17 @@
-//
-//  MomentumApp.swift
-//  Momentum
-//
-//  Created by Abdelrahman Mohamed on 29.12.2025.
-//
+// ── FILE: Momentum/MomentumApp.swift ──
 
 import SwiftUI
 import SwiftData
+import Data
 
 @main
 struct MomentumApp: App {
 
-    @State private var feedBuilder = FeedBuilder()
-    @State private var todoBuilder = ToDoBuilder()
+    @State private var container = AppDependencyContainer()
 
     var body: some Scene {
         WindowGroup {
-            ContentView(feedBuilder: feedBuilder, todoBuilder: todoBuilder)
+            ContentView(container: container)
         }
         .modelContainer(for: ToDoModel.self)
     }

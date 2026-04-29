@@ -6,6 +6,13 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		CC01003000000000000000AB /* Core in Frameworks */ = {isa = PBXBuildFile; productRef = CC01002000000000000000AB /* Core */; };
+		CC02003000000000000000AB /* Domain in Frameworks */ = {isa = PBXBuildFile; productRef = CC02002000000000000000AB /* Domain */; };
+		CC03003000000000000000AB /* Data in Frameworks */ = {isa = PBXBuildFile; productRef = CC03002000000000000000AB /* Data */; };
+		CC04003000000000000000AB /* Presentation in Frameworks */ = {isa = PBXBuildFile; productRef = CC04002000000000000000AB /* Presentation */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		AFA9638A2F02CEDC0045D081 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +59,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CC01003000000000000000AB /* Core in Frameworks */,
+				CC02003000000000000000AB /* Domain in Frameworks */,
+				CC03003000000000000000AB /* Data in Frameworks */,
+				CC04003000000000000000AB /* Presentation in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +123,10 @@
 			);
 			name = Momentum;
 			packageProductDependencies = (
+				CC01002000000000000000AB /* Core */,
+				CC02002000000000000000AB /* Domain */,
+				CC03002000000000000000AB /* Data */,
+				CC04002000000000000000AB /* Presentation */,
 			);
 			productName = Momentum;
 			productReference = AFA9637C2F02CEDB0045D081 /* Momentum.app */;
@@ -195,6 +210,12 @@
 			);
 			mainGroup = AFA963732F02CEDB0045D081;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				CC01001000000000000000AB /* XCLocalSwiftPackageReference "Packages/Core" */,
+				CC02001000000000000000AB /* XCLocalSwiftPackageReference "Packages/Domain" */,
+				CC03001000000000000000AB /* XCLocalSwiftPackageReference "Packages/Data" */,
+				CC04001000000000000000AB /* XCLocalSwiftPackageReference "Packages/Presentation" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = AFA9637D2F02CEDB0045D081 /* Products */;
 			projectDirPath = "";
@@ -615,6 +636,49 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		CC01001000000000000000AB /* XCLocalSwiftPackageReference "Packages/Core" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/Core;
+		};
+		CC02001000000000000000AB /* XCLocalSwiftPackageReference "Packages/Domain" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/Domain;
+		};
+		CC03001000000000000000AB /* XCLocalSwiftPackageReference "Packages/Data" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/Data;
+		};
+		CC04001000000000000000AB /* XCLocalSwiftPackageReference "Packages/Presentation" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/Presentation;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		CC01002000000000000000AB /* Core */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CC01001000000000000000AB /* XCLocalSwiftPackageReference "Packages/Core" */;
+			productName = Core;
+		};
+		CC02002000000000000000AB /* Domain */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CC02001000000000000000AB /* XCLocalSwiftPackageReference "Packages/Domain" */;
+			productName = Domain;
+		};
+		CC03002000000000000000AB /* Data */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CC03001000000000000000AB /* XCLocalSwiftPackageReference "Packages/Data" */;
+			productName = Data;
+		};
+		CC04002000000000000000AB /* Presentation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CC04001000000000000000AB /* XCLocalSwiftPackageReference "Packages/Presentation" */;
+			productName = Presentation;
+		};
+/* End XCSwiftPackageProductDependency section */
+
 	};
 	rootObject = AFA963742F02CEDB0045D081 /* Project object */;
 }

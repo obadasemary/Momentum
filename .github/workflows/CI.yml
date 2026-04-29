@@ -2,39 +2,143 @@ name: iOS Build & Test
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
-  test:
+  build:
+    name: Build
     runs-on: macos-26
     timeout-minutes: 30
 
     env:
-      XCODE_PROJECT: Momentum.xcodeproj
+      XCODE_WORKSPACE: Momentum.xcworkspace
       XCODE_SCHEME: Momentum
-      DESTINATION: 'platform=iOS Simulator,name=iPhone 17 Pro,OS=latest'
+      DESTINATION: "platform=iOS Simulator,name=iPhone 17 Pro,OS=latest"
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Run Tests
+      - name: Cache SPM
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.swiftpm
+            ~/Library/Developer/Xcode/DerivedData
+          key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
+          restore-keys: |
+            ${{ runner.os }}-spm-
+
+      - name: Build
         run: |
-          xcodebuild test \
-            -project $XCODE_PROJECT \
+          xcodebuild build \
+            -workspace $XCODE_WORKSPACE \
             -scheme $XCODE_SCHEME \
             -destination "$DESTINATION" \
-            -only-testing:MomentumTests \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            ONLY_ACTIVE_ARCH=YES \
+            | xcpretty || xcodebuild build \
+            -workspace $XCODE_WORKSPACE \
+            -scheme $XCODE_SCHEME \
+            -destination "$DESTINATION" \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             ONLY_ACTIVE_ARCH=YES
 
-      - name: Upload Logs
+  test:
+    name: Test with Coverage
+    runs-on: macos-26
+    timeout-minutes: 40
+    needs: build
+
+    env:
+      XCODE_WORKSPACE: Momentum.xcworkspace
+      XCODE_SCHEME: Momentum
+      DESTINATION: "platform=iOS Simulator,name=iPhone 17 Pro,OS=latest"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache SPM
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.swiftpm
+            ~/Library/Developer/Xcode/DerivedData
+          key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
+          restore-keys: |
+            ${{ runner.os }}-spm-
+
+      - name: Run App Tests
+        run: |
+          xcodebuild test \
+            -workspace $XCODE_WORKSPACE \
+            -scheme $XCODE_SCHEME \
+            -destination "$DESTINATION" \
+            -enableCodeCoverage YES \
+            -resultBundlePath TestResults.xcresult \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            ONLY_ACTIVE_ARCH=YES
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: TestResults.xcresult
+          retention-days: 7
+
+  package-tests:
+    name: Package Unit Tests
+    runs-on: macos-26
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        package: [Core, Domain, Data, Presentation]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache SPM
+        uses: actions/cache@v4
+        with:
+          path: ~/.swiftpm
+          key: ${{ runner.os }}-pkg-${{ matrix.package }}-${{ hashFiles(format('Packages/{0}/Package.swift', matrix.package)) }}
+          restore-keys: |
+            ${{ runner.os }}-pkg-${{ matrix.package }}-
+
+      - name: Test ${{ matrix.package }}
+        run: |
+          cd Packages/${{ matrix.package }}
+          swift test --enable-code-coverage
+
+      - name: Upload Logs on Failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: test-logs
-          path: ~/Library/Developer/Xcode/DerivedData/Momentum-*/Logs/Test/
+          name: ${{ matrix.package }}-test-logs
+          path: Packages/${{ matrix.package }}/.build/debug/*.xctest
           retention-days: 7
+
+  lint:
+    name: Lint
+    runs-on: macos-26
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run SwiftLint
+        run: |
+          if which swiftlint > /dev/null 2>&1; then
+            swiftlint --strict
+          else
+            echo "SwiftLint not installed — skipping lint step."
+          fi
