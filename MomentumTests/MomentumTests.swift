@@ -1,216 +1,83 @@
-//
-//  MomentumTests.swift
-//  MomentumTests
-//
-//  Created by Abdelrahman Mohamed on 29.12.2025.
-//
+// ── FILE: MomentumTests/MomentumTests.swift ──
+// App-level integration smoke tests.
+// Comprehensive unit tests live in the SPM package test targets:
+//   Packages/Core/Tests/CoreTests
+//   Packages/Domain/Tests/DomainTests
+//   Packages/Data/Tests/DataTests
+//   Packages/Presentation/Tests/PresentationTests
 
 import Testing
+import Foundation
+import Core
+import Domain
+import Presentation
 @testable import Momentum
 
+@Suite("App Smoke Tests")
 struct MomentumTests {
 
-    @MainActor
-    @Test("Test Fetch Feed With Success")
-    func fetchFeedWithSuccess() async throws {
-        
-        let response = [
-            CharactersResponse(
-                id: 1,
-                name: "Obada",
-                species: "Human",
-                image: nil
-            ),
-            CharactersResponse(
-                id: 2,
-                name: "Sara",
-                species: "Human",
-                image: nil
-            )
-        ]
-        
-        let makeSut = {
-            MockFeedUseCase(
-                result:
-                        .success(
-                            FeedEntity(
-                                info: .init(count: 1, pages: 1),
-                                results: response
-                            )
-                        )
-            )
+    @Test("URLSessionNetworkClient initialises")
+    func networkClientInitialises() {
+        let client = URLSessionNetworkClient()
+        #expect(client != nil)
+    }
+
+    @Test("ToDoEntity initialises with correct defaults")
+    func toDoEntityDefaults() {
+        let entity = ToDoEntity(title: "Smoke test")
+        #expect(entity.title == "Smoke test")
+        #expect(entity.isCompleted == false)
+        #expect(entity.notes == nil)
+    }
+
+    @Test("CharacterEntity initialises correctly")
+    func characterEntityInitialises() {
+        let entity = CharacterEntity(id: 42, name: "Rick", species: "Human", imageURL: nil)
+        #expect(entity.id == 42)
+        #expect(entity.name == "Rick")
+    }
+
+    @Test("FeedViewModel starts with empty characters")
+    func feedViewModelInitialState() {
+        final class StubUseCase: FetchCharactersUseCaseProtocol {
+            func execute(page: Int) async throws -> CharacterPageEntity {
+                CharacterPageEntity(totalCount: 0, totalPages: 1, characters: [])
+            }
         }
-        
-        let viewModel = FeedViewModel(feedUseCase: makeSut())
-        
-        await viewModel.loadData()
-        
-        #expect(viewModel.characters == response)
+        let vm = FeedViewModel(useCase: StubUseCase())
+        #expect(vm.characters.isEmpty)
+        #expect(vm.isLoading == false)
+        #expect(vm.errorMessage == nil)
     }
-    
-    @MainActor
-    @Test("Test Fetch Feed With Failure")
-    func fetchFeedWithFailure() async throws {
-        
-        let makeSut = {
-            MockFeedUseCase(
-                result:
-                        .failure(MockError.stub)
-            )
+
+    @Test("FeedViewModel loads characters successfully")
+    func feedViewModelLoadsCharacters() async {
+        final class StubUseCase: FetchCharactersUseCaseProtocol {
+            func execute(page: Int) async throws -> CharacterPageEntity {
+                CharacterPageEntity(
+                    totalCount: 1,
+                    totalPages: 1,
+                    characters: [CharacterEntity(id: 1, name: "Rick", species: "Human", imageURL: nil)]
+                )
+            }
         }
-        
-        let viewModel = FeedViewModel(feedUseCase: makeSut())
-        
-        await viewModel.loadData()
-        
-        #expect(viewModel.characters.isEmpty)
-    }
-    
-    @MainActor
-    @Test("Loading state becomes false after fetch")
-    func loadingStateToggle() async {
-
-        let sut = FeedViewModel(
-            feedUseCase: MockFeedUseCase(
-                result: .success(
-                    .init(
-                        info: .init(
-                            count: 0,
-                            pages: 0
-                        ),
-                        results: []
-                    )
-                )
-            )
-        )
-
-        #expect(sut.isLoading == false)
-
-        let loadTask = Task { await sut.loadData() }
-
-        await loadTask.value
-
-        #expect(sut.isLoading == false)
+        let vm = FeedViewModel(useCase: StubUseCase())
+        await vm.loadData()
+        #expect(vm.characters.count == 1)
     }
 
-    @MainActor
-    @Test("Error message is set when fetch fails")
-    func errorMessageSetOnFailure() async {
-        let sut = FeedViewModel(
-            feedUseCase: MockFeedUseCase(
-                result: .failure(MockError.stub)
-            )
-        )
-
-        #expect(sut.errorMessage == nil)
-
-        await sut.loadData()
-
-        #expect(sut.errorMessage != nil)
-    }
-
-    @MainActor
-    @Test("Error message is cleared on retry")
-    func errorMessageClearedOnRetry() async {
-        let mockUseCase = MockFeedUseCase(
-            result: .failure(MockError.stub)
-        )
-        let sut = FeedViewModel(feedUseCase: mockUseCase)
-
-        await sut.loadData()
-        #expect(sut.errorMessage != nil)
-
-        mockUseCase.result = .success(
-            FeedEntity(
-                info: .init(count: 1, pages: 1),
-                results: []
-            )
-        )
-
-        await sut.loadData()
-        #expect(sut.errorMessage == nil)
-    }
-
-    @MainActor
-    @Test("Characters array is replaced on refresh")
-    func charactersReplacedOnRefresh() async {
-        let firstResponse = [
-            CharactersResponse(id: 1, name: "First", species: "Human", image: nil)
-        ]
-        let secondResponse = [
-            CharactersResponse(id: 2, name: "Second", species: "Alien", image: nil)
-        ]
-
-        let mockUseCase = MockFeedUseCase(
-            result: .success(
-                FeedEntity(
-                    info: .init(count: 1, pages: 1),
-                    results: firstResponse
-                )
-            )
-        )
-        let sut = FeedViewModel(feedUseCase: mockUseCase)
-
-        await sut.loadData()
-        #expect(sut.characters == firstResponse)
-
-        mockUseCase.result = .success(
-            FeedEntity(
-                info: .init(count: 1, pages: 1),
-                results: secondResponse
-            )
-        )
-
-        await sut.loadData()
-        #expect(sut.characters == secondResponse)
-    }
-
-    @MainActor
-    @Test("Invalid URL error is handled correctly")
-    func invalidURLError() async {
-        let sut = FeedViewModel(
-            feedUseCase: MockFeedUseCase(
-                result: .failure(FeedViewModel.FeedError.invalidURL)
-            )
-        )
-
-        await sut.loadData()
-
-        #expect(sut.errorMessage == "Invalid feed URL configuration")
-        #expect(sut.characters.isEmpty)
-    }
-
-    @MainActor
-    @Test("Characters persist when error occurs on refresh")
-    func charactersPersistOnRefreshError() async {
-        let initialResponse = [
-            CharactersResponse(id: 1, name: "Persisted", species: "Human", image: nil)
-        ]
-
-        let mockUseCase = MockFeedUseCase(
-            result: .success(
-                FeedEntity(
-                    info: .init(count: 1, pages: 1),
-                    results: initialResponse
-                )
-            )
-        )
-        let sut = FeedViewModel(feedUseCase: mockUseCase)
-
-        await sut.loadData()
-        #expect(sut.characters == initialResponse)
-
-        mockUseCase.result = .failure(MockError.stub)
-
-        await sut.loadData()
-        #expect(sut.characters == initialResponse)
-        #expect(sut.errorMessage != nil)
-    }
-}
-
-private extension MomentumTests {
-    
-    enum MockError: Error {
-        case stub
+    @Test("ToDoViewModel starts in idle state")
+    func toDoViewModelInitialState() {
+        final class StubUseCase: ToDoUseCaseProtocol {
+            func fetchAll() async throws -> [ToDoEntity] { [] }
+            func create(title: String, notes: String?) async throws -> ToDoEntity { ToDoEntity(title: title) }
+            func update(_ todo: ToDoEntity) async throws {}
+            func delete(_ id: UUID) async throws {}
+            func toggleCompletion(_ id: UUID) async throws {}
+        }
+        let vm = ToDoViewModel(useCase: StubUseCase())
+        if case .idle = vm.state { } else {
+            Issue.record("Expected idle state")
+        }
     }
 }

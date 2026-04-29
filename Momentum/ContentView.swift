@@ -1,20 +1,21 @@
+// ── FILE: Momentum/ContentView.swift ──
+
 import SwiftUI
-import SwiftData
 
 struct ContentView: View {
-    let feedBuilder: FeedBuilder
-    let todoBuilder: ToDoBuilder
+
+    let container: AppDependencyContainer
 
     @Environment(\.modelContext) private var modelContext
 
     var body: some View {
         TabView {
             Tab("Feed", systemImage: "person.3") {
-                feedBuilder.buildFeedView()
+                container.makeFeedView()
             }
 
             Tab("To-Do", systemImage: "checkmark.circle") {
-                todoBuilder.buildToDoListView(modelContext: modelContext)
+                container.makeToDoView(modelContext: modelContext)
             }
         }
     }
